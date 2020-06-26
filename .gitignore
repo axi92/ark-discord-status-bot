@@ -1,0 +1,9 @@
+node_modules
+*-linux
+*-macos
+*.exe
+config.json
+notes
+steamcmd_bin
+logs
+sunny-cron
