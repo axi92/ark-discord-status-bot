@@ -17,8 +17,14 @@ async function main() {
     message_instances.forEach(function (message, index, object) {
       message.edit(GenerateStatusMessage())
         .catch(function (err) {
-          // message was deleted from a user, and removed from instance
-          object.splice(index, 1);
+          console.log(err);
+          if(err.message == 'Unknown Message'){
+            object.splice(index, 1);
+            // message was deleted from a user, and removed from instance
+            console.log('message deleted and removed');
+            console.log('message_instances');
+            console.log(message_instances);
+          }
         })
     });
   });
