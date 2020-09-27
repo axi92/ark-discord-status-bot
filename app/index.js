@@ -7,6 +7,8 @@ require("file-logger")(true);
 const client = new Discord.Client();
 
 var message_instances = [];
+const support_channel_id = '654803927350640658';
+const ping_channel_id = '758023769242599604';
 
 console.log('Servers to watch:', config.server.length);
 GetServerStatus();
@@ -40,6 +42,15 @@ async function main() {
       message_instances.push(message);
     }
   });
+
+  client.on("voiceStateUpdate", function(oldMember, newMember){
+    var newUserChannel = newMember.channelID;
+    var textChannel = client.channels.cache.get(ping_channel_id);
+    console.log(newMember.member.user);
+    if(newUserChannel === support_channel_id) {
+      textChannel.send(`<@${newMember.member.user.id}> hat den Support betreten!`)
+    }
+  })
 
   client.login(config.discord.bottoken);
 
