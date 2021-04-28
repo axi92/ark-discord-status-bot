@@ -3,12 +3,19 @@ const query = require("source-server-query");
 const schedule = require('node-schedule');
 const moment = require('moment');
 const Discord = require('discord.js');
+const SteamID = require('steamid');
+var execSh = require("exec-sh");
 require("file-logger")(true);
 const client = new Discord.Client();
 
 var message_instances = [];
+// var WhereAmISearchQueue = [];
+// var SearchActive = false;
+var countActiveSearch = 0;
+const MaxActiveSearch = 10;
 const support_channel_id = '654803927350640658';
 const ping_channel_id = '758023769242599604';
+const prefix = '!';
 
 console.log('Servers to watch:', config.server.length);
 GetServerStatus();
@@ -36,10 +43,36 @@ async function main() {
   });
 
   client.on('message', async msg => {
+    const args = msg.content.slice(prefix.length).trim().split(' ');
+    const command = args.shift().toLowerCase();
     if (msg.content === '!status' && msg.channel.name == 'status') {
       msg.delete();
       let message = await msg.channel.send(GenerateStatusMessage());
       message_instances.push(message);
+    }
+    if( command === 'whereami') {
+      if (!args.length) {
+        return msg.channel.send(`Du musst deine SteamID64 angeben, ${msg.author}!`);
+      }
+      else {
+        let sid = new SteamID(args[0]);
+        if(sid.isValid() === false){
+          return msg.channel.send(`Falsche SteamID64, ${msg.author}!`);
+        } else {
+          msg.channel.send('Dein Charakter wird auf dem Cluster gesucht, dieser Vorgang kann bis zu 5 Minuten dauern...');
+          console.log('search started for ', args[0]);
+          countActiveSearch++;
+          execSh('bash ./search.sh ' + args[0], true,
+          function(err, stdout, stderr){
+            console.log("error: ", err);
+            console.log("stdout: ", stdout);
+            msg.channel.send(stdout + `${msg.author}`);
+            countActiveSearch--;
+            console.log('countActiveSearch: ', countActiveSearch);
+            console.log("stderr: ", stderr);
+          })
+        }
+      }
     }
   });
 
@@ -78,7 +111,6 @@ function GetServerStatus() {
 }
 
 function GenerateStatusMessage() {
-
   let main_content = '```\n';
   let content;
   let players_cluster = 0;
