@@ -45,7 +45,7 @@ async function main() {
   client.on('message', async msg => {
     const args = msg.content.slice(prefix.length).trim().split(' ');
     const command = args.shift().toLowerCase();
-    if (msg.content === '!status' && msg.channel.name == 'status') {
+    if (msg.content === '!status' && msg.channel.name == 'status-rollenzuweisung') {
       msg.delete();
       let message = await msg.channel.send(GenerateStatusMessage());
       message_instances.push(message);
