@@ -23,7 +23,6 @@ GetServerStatus();
 
 async function main() {
   var j = schedule.scheduleJob('0 * * * * *', async function () {
-    loadConfig();
     await GetServerStatus();
     message_instances.forEach(function (message, index, object) {
       message.edit(GenerateStatusMessage())
@@ -114,6 +113,7 @@ function GetServerStatus() {
 }
 
 function GenerateStatusMessage() {
+  loadConfig()
   let main_content = '```\n';
   let content;
   let players_cluster = 0;
