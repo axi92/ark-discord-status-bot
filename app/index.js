@@ -5,14 +5,16 @@ const moment = require('moment');
 const Discord = require('discord.js');
 require("file-logger")(true);
 const client = new Discord.Client();
+const fs = require('fs');
 
 var message_instances = [];
 
-console.log('Servers to watch:', config.server.length);
+// console.log('Servers to watch:', config.server.length);
 GetServerStatus();
 
 async function main() {
   var j = schedule.scheduleJob('0 * * * * *', async function () {
+    loadConfig();
     await GetServerStatus();
     message_instances.forEach(function (message, index, object) {
       message.edit(GenerateStatusMessage())
@@ -47,6 +49,7 @@ async function main() {
 main().catch(console.error);
 
 function GetServerStatus() {
+  loadConfig();
   config.server.forEach(element => {
     query.info(element.ip, element.rconport, 5000)
       .then(function (value) {
@@ -78,4 +81,9 @@ function GenerateStatusMessage() {
   });
   content = main_content + 'Cluster Spieler: ' + players_cluster + '\n' + 'Letzte Aktualisierung: ' + moment().format('HH:mm') + '\n```';
   return content;
+}
+
+function loadConfig(){
+  let readData = fs.readFileSync('./status_bot_config.json');
+  config.server = JSON.parse(readData.toString()).server;
 }
