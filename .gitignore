@@ -8,4 +8,5 @@ steamcmd_bin
 logs
 sunny-cron
 core
-search.sh
+search_config.sh
+status_bot_config.json
